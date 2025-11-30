@@ -32,12 +32,24 @@ app.get("/listings", async (req, res) => {
   const allListings = await Listing.find({});
   res.render("listings/index", { allListings });
 });
-
+//new rout
+app.get("/listings/new",async(req,res)=>{
+  res.render("listings/new.ejs");
+});
 //show route
 app.get("/listings/:id",async (req,res)=>{
   let {id}=req.params;
   const listing=await Listing.findById(id);
   res.render("listings/show.ejs",{listing} );
+});
+//create route
+app.post("/listings",async (req,res)=>{
+  // let{title,description,image,price,country,location}=req.body;
+  // let listing=req.body.listings;
+  const newListing=new Listing(req.body.listings);
+  await newListing.save();
+  // console.log(listing);
+  res.redirect("/listings");
 });
 
 /*
