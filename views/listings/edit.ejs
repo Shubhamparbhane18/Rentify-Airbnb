@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wanderlust</title>
-</head>
-<body>
+<% layout("layouts/boilerplate")%>
   <h3>Edit listing</h3>
 
   <form method="POST" action="/listings/<%= listing._id%>?_method=PUT">
@@ -20,7 +13,7 @@
     <br/><br/>
 
     <!-- IMAGE URL -->
-    <input type="text" name="listing[image]" value="<%= listing.image %>">
+    <input type="text" name="listing[image]" value="<%= listing.image.url %>">
     <br/><br/>
 
     <!-- PRICE -->

@@ -50,7 +50,7 @@ app.get("/listings/:id",async (req,res)=>{
 app.post("/listings",async (req,res)=>{
   // let{title,description,image,price,country,location}=req.body;
   // let listing=req.body.listings;
-  const newListing=new Listing(req.body.listings);
+  const newListing=new Listing(req.body.listing);
   await newListing.save();
   // console.log(listing);
   res.redirect("/listings");
