@@ -3,38 +3,39 @@
   <div class="col-8 offset-2" >
    
     <h3>Create a new listing</h3>
-    <form method="POST" action="/listings">
+    <form method="POST" action="/listings" novalidate class="needs-validation">
       <div class="mb-3">
         <label for="title" class="form-label">Title</label>
         <input type="text" name="listing[title]" placeholder="Add a catchy title"
-        class="form-control">
+        class="form-control" required>
+        
       </div>
       <div class="mb-3"> <label for="description" class="form-label">Description</label>
         <textarea name="listing[description]" placeholder="Enter description"
-        class="form-control"></textarea>
+        class="form-control" required></textarea>
       </div>
       <div class="mb-3">
         <label for="image" class="form-label">image</label> 
-        <input type="text" name="listing[image][url]" placeholder="Enter image URL" class="form-control">
+        <input type="text" name="listing[image][url]" placeholder="Enter image URL" class="form-control" >
       </div>
 
       <div class="row">
         <div class="mb-3 col-md-4" >
           <label for="price" class="form-label">Price</label> 
-          <input type="number" name="listing[price]" placeholder="12000" class="form-control ">
+          <input type="number" name="listing[price]" placeholder="12000" class="form-control " required>
         </div>
         
         <div class="mb-3 col-md-8">
           <label for="country" class="form-label">country</label> 
-          <input type="text" name="listing[country]" placeholder="India" class="form-control">
+          <input type="text" name="listing[country]" placeholder="India" class="form-control" required>
         </div>
       </div>
       
       <div class="mb-3">
         <label for="location" class="form-label">location</label> 
-        <input type="text" name="listing[location]" placeholder="Jaipur,Rajastan"  class="form-control">
+        <input type="text" name="listing[location]" placeholder="Jaipur,Rajastan"  class="form-control" required>
       </div>    
-      <button class="btn" style="background-color: #fe424d;color:white;border:none">Submit</button>
+      <button class="btn btn-dark" style="background-color: #fe424d;color:white;border:none">Submit</button>
       <br><br>
     </form>
   </div>
