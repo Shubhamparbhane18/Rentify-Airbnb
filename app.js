@@ -13,8 +13,8 @@ const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const mongo_url = "mongodb://127.0.0.1:27017/wanderlust";
 const ExpressError = require("./utils/ExpressError.js");
-const {listingSchema}=require("./schema.js");
-const Review=require("./models/reviews.js"); 
+const {listingSchema,reviewSchema}=require("./schema.js");
+const Review=require("./models/review.js"); 
 main()
   .then(()=>{
     console.log("connected to db");
@@ -48,6 +48,18 @@ const validateListing= (req,res,next)=>{
     next();
   }
 };
+
+//validate review
+//middleware for the validation of schemas
+const validateReview= (req,res,next)=>{
+  const { error } = reviewSchema.validate(req.body);
+  if (error) {
+    const errMsg = error.details.map(el => el.message).join(", ");
+    throw new ExpressError(400, errMsg);
+  } else {
+    next();
+  }
+};
 //index route
 app.get("/listings", wrapAsync(async (req, res) => {
   const allListings = await Listing.find({});
@@ -60,7 +72,7 @@ app.get("/listings/new",wrapAsync(async(req,res)=>{
 //show route
 app.get("/listings/:id",wrapAsync(async (req,res)=>{
   let {id}=req.params;
-  const listing=await Listing.findById(id);
+  const listing=await Listing.findById(id).populate("reviews");
   res.render("listings/show.ejs",{listing} );
 }));
 //create route
@@ -70,19 +82,13 @@ app.post("/listings", validateListing, wrapAsync(async (req, res, next) => {
     // let listing=req.body.listings;
   const newListing = new Listing(req.body.listing);
   await newListing.save();
-
-  // ****** API-safe response
-  res.status(201).json({
-    success: true,
-    message: "Listing created successfully",
-    listing: newListing
-  });
     res.redirect("/listings");
 }));
 
 
 //edit route
 app.get("/listings/:id/edit",wrapAsync(async (req,res)=>{
+  
  let{id}=req.params;
  const listing=await Listing.findById(id);
  res.render("listings/edit.ejs",{listing});
@@ -106,18 +112,18 @@ app.delete("/listings/:id",wrapAsync(async(req,res)=>{
 
 //review 
 //post route
+app.post("/listings/:id/reviews", validateReview, wrapAsync(async (req,res) => {
+  console.log("REQ BODY =", req.body);
+  const listing = await Listing.findById(req.params.id);
+  const newReview = new Review(req.body.review);
 
-app.post("/listings/:id/reviews",async(req,res)=>
-{
-  let listing= await Listing.findById(req.params.id);
-  let newReview=new Review(req.body.review);
-  listing.reviews.push(newReview);
-  
+  listing.reviews.push(newReview._id);
+
   await newReview.save();
   await listing.save();
-  res.redirect(`/listings/${listing._id}`);
+ res.redirect(`/listings/${listing._id}`);
+}));
 
-});
 
 /*
 app.get("/testListing",async (req,res)=>{
