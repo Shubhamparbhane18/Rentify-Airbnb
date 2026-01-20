@@ -13,9 +13,12 @@ const mongo_url = "mongodb://127.0.0.1:27017/wanderlust";
 const ExpressError = require("./utils/ExpressError.js");
 const session= require('express-session');
 const flash=require("connect-flash"); 
-
-const listings=require("./routes/listing.js");
-const reviews=require("./routes/review.js");
+const User=require("./models/user.js");
+const passport=require("passport");
+const LocalStrategy=require("passport-local");
+const listingsRouter=require("./routes/listing.js");
+const reviewsRouter=require("./routes/review.js");
+const userRouter=require("./routes/user.js");
 main()
   .then(()=>{
     console.log("connected to db");
@@ -41,6 +44,12 @@ const sessionOptions = {
 
 app.use(session(sessionOptions));
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
@@ -57,9 +66,17 @@ app.use(express.static(path.join(__dirname,"/public")));
 app.get("/",(req,res)=>{
   res.send("hi,I am robot");
 });
-
-app.use("/listings",listings);
-app.use("/listings/:id/reviews",reviews);
+// app.get("/demouser",async (req,res)=>{
+//   let fakeUser=new User({
+//     email:"student@gmail.com",
+//     username:"student-delta"
+//   });
+//   let newregister=await User.register(fakeUser,"hello word");
+//   res.send(newregister);
+// })
+app.use("/listings",listingsRouter);
+app.use("/listings/:id/reviews",reviewsRouter);
+app.use("/",userRouter);
 
 app.use((req, res, next) => {
   next(new ExpressError(404, "Page not found!"));
