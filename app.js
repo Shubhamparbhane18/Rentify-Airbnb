@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
-
+const {isLoggedIn}=require("./midddleware.js");
 app.use(express.urlencoded({ extended: true }));  // For EJS forms
 app.use(express.json());                          // For Hoppscotch / Postman
 // JSON
@@ -54,6 +54,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
+  res.locals.currUser=req.user;
   next();
 });
 
