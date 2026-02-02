@@ -7,9 +7,7 @@
       
       <a href="/listings/<%= listing._id %>" class="listing-link">
         <div class="listing-card col">
-          <img src="<%= listing.image?.url && listing.image.url.trim() !== '' 
-        ? listing.image.url 
-        : 'https://images.unsplash.com/photo-1586810724476-c294fb7ac01b?q=80&w=436&auto=format&fit=crop' %>" class="card-img-top" style="height:200px;" alt="listing_image">
+          <img src="<%= listing.image.url %>" class="card-img-top" style="height:200px;" alt="listing_image">
           <div class="card-img-overlay"></div>
           <div class="card-body">
             <p class="card-text">

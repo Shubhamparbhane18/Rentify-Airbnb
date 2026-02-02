@@ -9,10 +9,8 @@ const upload =multer({storage});
 router
   .route("/")
   .get(wrapAsync(listingsController.index))
-  // .post(isLoggedIn,validateListing ,wrapAsync(listingsController.createListing));
-  .post(upload.single("image"),(req,res)=>{
-    res.send(req.file);
-  })
+  .post(isLoggedIn,upload.single("image"),validateListing ,wrapAsync(listingsController.createListing));
+  
 router.route("/new")
   .get(isLoggedIn,listingsController.newListing);
 router.route("/:id/edit")
