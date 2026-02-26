@@ -83,10 +83,21 @@ body{
   border-radius: 1rem;
 }
 
-.card-img-overlay:hover{
-  opacity: 0.2;
+.card-img-overlay{
+  position: absolute;
+  inset: 0;
+  opacity: 0;
   background-color: white;
+  transition: opacity 0.25s ease;
+  border-radius: 1rem;
+  pointer-events: none;
 }
+
+
+.listing-card:hover .card-img-overlay{
+  opacity: 0.30;
+}
+
 
 /* Show page */
 .show-img{

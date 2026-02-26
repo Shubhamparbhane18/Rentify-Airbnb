@@ -8,7 +8,6 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
-const {isLoggedIn}=require("./midddleware.js");
 app.use(express.urlencoded({ extended: true }));  // For EJS forms
 app.use(express.json());                          // For Hoppscotch / Postman
 // JSON
@@ -70,9 +69,9 @@ app.use(methodOverride("_method"));
 app.engine('ejs',ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
 
-app.get("/",(req,res)=>{
-  res.send("hi,I am robot");
-});
+// app.get("/",(req,res)=>{
+//   res.send("hi,I am robot");
+// });
 // app.get("/demouser",async (req,res)=>{
 //   let fakeUser=new User({
 //     email:"student@gmail.com",

@@ -1,40 +1,44 @@
 const User = require("../models/user.js");
-const passport = require("passport");
 
+// ====================== SIGNUP PAGE ======================
 module.exports.signup = (req, res) => {
   res.render("users/signUp.ejs");
 };
 
+// ====================== SIGNUP LOGIC ======================
 module.exports.correctSignIn = async (req, res, next) => {
-  try {
-    const { username, email, password } = req.body;
 
-    const newUser = new User({ email, username });
-    const registeredUser = await User.register(newUser, password);
+  const { username, email, password } = req.body;
 
-    req.login(registeredUser, (err) => {
-      if (err) return next(err);
+  const newUser = new User({ email, username });
 
-      req.flash("success", "Welcome to Wanderlust!");
-      res.redirect("/listings");
-    });
-  } catch (e) {
-    req.flash("error", e.message);
-    res.redirect("/signup");
-  }
+  const registeredUser = await User.register(newUser, password);
+
+  req.login(registeredUser, (err) => {
+    if (err) return next(err);
+
+    req.flash("success", "Welcome to Wanderlust!");
+    res.redirect("/listings");
+  });
 };
 
+// ====================== LOGIN PAGE ======================
 module.exports.loginIn = (req, res) => {
   res.render("users/login.ejs");
 };
 
-module.exports.correctLogIn = async (req, res) => {
-  req.flash("success", "Welcome to Wanderlust!");
+// ====================== LOGIN SUCCESS ======================
+module.exports.correctLogIn = (req, res) => {
+
+  req.flash("success", "Welcome back to Wanderlust!");
+
   const redirectUrl = res.locals.redirectUrl || "/listings";
   res.redirect(redirectUrl);
 };
 
+// ====================== LOGOUT ======================
 module.exports.logOut = (req, res, next) => {
+
   req.logout((err) => {
     if (err) return next(err);
 
