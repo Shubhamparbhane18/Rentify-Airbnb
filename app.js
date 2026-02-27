@@ -2,7 +2,7 @@ if(process.env.NODE_ENV !="production"){
 
   require("dotenv").config();
 }
-console.log(process.env.SECRET);
+
 
 const express = require("express");
 const app = express();
@@ -14,9 +14,11 @@ app.use(express.json());                          // For Hoppscotch / Postman
 
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const mongo_url = "mongodb://127.0.0.1:27017/wanderlust";
+
+const dbUrl=process.env.ATLASDB_URL;
 const ExpressError = require("./utils/ExpressError.js");
 const session= require('express-session');
+const MongoStore=require('connect-mongo');
 const flash=require("connect-flash"); 
 const User=require("./models/user.js");
 const passport=require("passport");
@@ -33,11 +35,23 @@ main()
   });
 
 async function main(){
-  await mongoose.connect(mongo_url);
+  await mongoose.connect(dbUrl);
 }
 
+const store=MongoStore.create({
+  mongoUrl:dbUrl,
+  crypto:{
+    secret:process.env.SECRET,
+  },
+  touchAfter:24*3600
+});
+
+store.on("error",(err)=>{
+  console.log("error in mongo session store",err);
+});
 const sessionOptions = {
-  secret: "mysupersecretcode",
+  store,
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
   cookie:{ 
@@ -94,7 +108,8 @@ app.use((err, req, res, next) => {
   /*res.status(statusCode).send( message );
 */
 });
+const port = process.env.PORT || 8080;
 
-app.listen(8080,()=>{
-  console.log("server is listening to port 8080");
+app.listen(port,()=>{
+  console.log(`server is listening to port ${port}`);
 });
