@@ -88,7 +88,12 @@ module.exports.createListing = async (req, res) => {
   const locationName = req.body.listing.location;
 
   const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`
+    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`,
+    {
+      headers: {
+        "User-Agent": "wanderlust-app (your-email@example.com)"
+      }
+    }
   );
 
   const data = await response.json();
@@ -131,7 +136,12 @@ module.exports.updateListing = async (req, res) => {
   const locationName = req.body.listing.location;
 
   const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`
+    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`,
+    {
+      headers: {
+        "User-Agent": "wanderlust-app (your-email@example.com)"
+      }
+    }
   );
 
   const data = await response.json();
