@@ -86,17 +86,21 @@ module.exports.createListing = async (req, res) => {
   newListing.image = { url, filename };
 
   const locationName = req.body.listing.location;
-
-  const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`,
-    {
-      headers: {
-        "User-Agent": "wanderlust-app (your-email@example.com)"
-      }
+const response = await fetch(
+  `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`,
+  {
+    headers: {
+      "User-Agent": "wanderlust-app",
+      "Accept": "application/json"
     }
-  );
+  }
+);
 
-  const data = await response.json();
+if (!response.ok) {
+  throw new Error("Geocoding API failed");
+}
+
+const data = await response.json();
 
   if (data.length === 0) {
     req.flash("error", "Please enter a valid location name.");
@@ -136,15 +140,20 @@ module.exports.updateListing = async (req, res) => {
   const locationName = req.body.listing.location;
 
   const response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`,
-    {
-      headers: {
-        "User-Agent": "wanderlust-app (your-email@example.com)"
-      }
+  `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`,
+  {
+    headers: {
+      "User-Agent": "wanderlust-app",
+      "Accept": "application/json"
     }
-  );
+  }
+);
 
-  const data = await response.json();
+if (!response.ok) {
+  throw new Error("Geocoding API failed");
+}
+
+const data = await response.json();
 
   if (data.length === 0) {
     req.flash("error", "Please enter a valid location name");
