@@ -86,22 +86,27 @@ module.exports.createListing = async (req, res) => {
 
   const locationName = req.body.listing.location;
 
+  // 🔒 Location validation
+  if (!locationName || locationName.trim() === "") {
+    req.flash("error", "Location is required.");
+    return res.redirect("/listings/new");
+  }
+
   const apiKey = process.env.OPENCAGE_API_KEY;
 
+  if (!apiKey) {
+    throw new Error("OpenCage API key not configured");
+  }
+
   const response = await fetch(
-  `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${apiKey}&limit=1`
-);
+    `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${apiKey}&limit=1`
+  );
 
-console.log("OpenCage Status:", response.status);
+  if (!response.ok) {
+    throw new Error("OpenCage API request failed");
+  }
 
-const text = await response.text();
-console.log("OpenCage Response:", text);
-
-if (!response.ok) {
-  throw new Error("OpenCage API request failed");
-}
-
-const data = JSON.parse(text);
+  const data = await response.json();
 
   if (!data.results || data.results.length === 0) {
     req.flash("error", "Please enter a valid location.");
@@ -116,7 +121,7 @@ const data = JSON.parse(text);
   req.flash("success", "New listing created successfully!");
   res.redirect("/listings");
 };
-// ====================== UPDATE ======================
+// ====================== UPDATE ===================
 module.exports.updateListing = async (req, res) => {
 
   const { id } = req.params;
@@ -138,22 +143,28 @@ module.exports.updateListing = async (req, res) => {
   }
 
   const locationName = req.body.listing.location;
+
+  // Location validation
+  if (!locationName || locationName.trim() === "") {
+    req.flash("error", "Location is required.");
+    return res.redirect(`/listings/${id}/edit`);
+  }
+
   const apiKey = process.env.OPENCAGE_API_KEY;
 
- const response = await fetch(
-  `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${apiKey}&limit=1`
-);
+  if (!apiKey) {
+    throw new Error("OpenCage API key not configured");
+  }
 
-console.log("OpenCage Status:", response.status);
+  const response = await fetch(
+    `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${apiKey}&limit=1`
+  );
 
-const text = await response.text();
-console.log("OpenCage Response:", text);
+  if (!response.ok) {
+    throw new Error("OpenCage API request failed");
+  }
 
-if (!response.ok) {
-  throw new Error("OpenCage API request failed");
-}
-
-const data = JSON.parse(text);
+  const data = await response.json();
 
   if (!data.results || data.results.length === 0) {
     req.flash("error", "Please enter a valid location.");
