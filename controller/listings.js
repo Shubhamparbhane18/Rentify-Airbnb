@@ -70,7 +70,6 @@ module.exports.showListings = async (req, res) => {
 
   res.render("listings/show.ejs", { listing });
 };
-
 // ====================== CREATE ======================
 module.exports.createListing = async (req, res) => {
 
@@ -86,36 +85,32 @@ module.exports.createListing = async (req, res) => {
   newListing.image = { url, filename };
 
   const locationName = req.body.listing.location;
-const response = await fetch(
-  `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`,
-  {
-    headers: {
-      "User-Agent": "wanderlust-app",
-      "Accept": "application/json"
-    }
+
+  const apiKey = process.env.OPENCAGE_API_KEY;
+
+  const response = await fetch(
+    `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${apiKey}&limit=1`
+  );
+
+  if (!response.ok) {
+    throw new Error("OpenCage API request failed");
   }
-);
 
-if (!response.ok) {
-  throw new Error("Geocoding API failed");
-}
+  const data = await response.json();
 
-const data = await response.json();
-
-  if (data.length === 0) {
-    req.flash("error", "Please enter a valid location name.");
+  if (!data.results || data.results.length === 0) {
+    req.flash("error", "Please enter a valid location.");
     return res.redirect("/listings/new");
   }
 
-  newListing.latitude = parseFloat(data[0].lat);
-  newListing.longitude = parseFloat(data[0].lon);
+  newListing.latitude = data.results[0].geometry.lat;
+  newListing.longitude = data.results[0].geometry.lng;
 
   await newListing.save();
 
   req.flash("success", "New listing created successfully!");
   res.redirect("/listings");
 };
-
 // ====================== UPDATE ======================
 module.exports.updateListing = async (req, res) => {
 
@@ -138,37 +133,31 @@ module.exports.updateListing = async (req, res) => {
   }
 
   const locationName = req.body.listing.location;
+  const apiKey = process.env.OPENCAGE_API_KEY;
 
   const response = await fetch(
-  `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`,
-  {
-    headers: {
-      "User-Agent": "wanderlust-app",
-      "Accept": "application/json"
-    }
+    `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${apiKey}&limit=1`
+  );
+
+  if (!response.ok) {
+    throw new Error("OpenCage API request failed");
   }
-);
 
-if (!response.ok) {
-  throw new Error("Geocoding API failed");
-}
+  const data = await response.json();
 
-const data = await response.json();
-
-  if (data.length === 0) {
-    req.flash("error", "Please enter a valid location name");
+  if (!data.results || data.results.length === 0) {
+    req.flash("error", "Please enter a valid location.");
     return res.redirect(`/listings/${id}/edit`);
   }
 
-  listing.latitude = parseFloat(data[0].lat);
-  listing.longitude = parseFloat(data[0].lon);
+  listing.latitude = data.results[0].geometry.lat;
+  listing.longitude = data.results[0].geometry.lng;
 
   await listing.save();
 
   req.flash("success", "Listing Updated Successfully!");
   res.redirect(`/listings/${id}`);
 };
-
 // ====================== DELETE ======================
 module.exports.deleteListing = async (req, res) => {
 
